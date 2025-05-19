@@ -1,0 +1,29 @@
+package com.wxs.config;
+
+import com.wxs.util.CustomJsonRedisSerializer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+@Configuration
+public class RedisConfig {
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+
+        // Key采用字符串序列化
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+
+        // Value采用自定义JSON序列化
+        template.setValueSerializer(new CustomJsonRedisSerializer<>(Object.class));
+        template.setHashValueSerializer(new CustomJsonRedisSerializer<>(Object.class));
+
+        template.afterPropertiesSet();
+        return template;
+    }
+}

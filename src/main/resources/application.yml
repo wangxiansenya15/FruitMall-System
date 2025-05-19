@@ -1,0 +1,62 @@
+# 应用端口号
+server:
+  port: 8080
+
+# spring配置文件
+spring:
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/fruitdb
+    username: root
+    password: wjb202218
+    # 数据库连接池配置
+#    type: com.alibaba.druid.pool.DruidDataSource
+#    druid:
+#      initial-size: 5
+#      min-idle: 15
+#      max-active: 20
+
+  # 文件配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 115MB
+
+  # mybatis-plus配置
+
+  # 邮件配置
+  mail:
+    host: smtp.qq.com
+    username: 2958367950@qq.com
+    port: 465
+    password: qaxmkjtzsyvtdfed
+    properties:
+      mail.smtp.ssl.enable: true
+      mail.smtp.auth: true
+      mail.smtp.socketFactory.class: javax.net.ssl.SSLSocketFactory
+      mail.smtp.starttls.enable: false
+
+  # redis配置
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password:
+      database: 0
+      timeout: 5000
+
+# swagger配置
+springdoc:
+   api-docs:
+     path: /v3/api-docs  # OpenAPI 规范文档地址
+   swagger-ui:
+     enabled: true
+     tags-sorter: alpha
+     operations-sorter: alpha
+
+# jwt配置
+jwt:
+  secret: fruit-mall-secret-key-for-authentication-256bits  # 密钥长度已增加到至少32个字符(256位)
+  expire: 864000  # 10天过期
+

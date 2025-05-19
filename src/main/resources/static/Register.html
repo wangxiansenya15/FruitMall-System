@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鲜果多 - 会员注册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            background-image: url('https://images.unsplash.com/photo-1550258987-190a2d41a8ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo h1 {
+            color: #ff6b6b;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #ff6b6b;
+            outline: none;
+        }
+
+        .form-group .error {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .btn {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #ff5252;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #ff6b6b;
+            text-decoration: none;
+        }
+
+        .fruit-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .verification-code {
+            display: flex;
+            gap: 10px;
+        }
+
+        .verification-code input {
+            flex: 1;
+        }
+
+        .verification-code button {
+            width: 120px;
+        }
+
+        .countdown {
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">
+        <h1>🍓 鲜果多商城</h1>
+        <p>新鲜水果，每日直达</p>
+    </div>
+
+    <form id="registerForm">
+        <div class="form-group">
+            <label for="username">🍎 用户名</label>
+            <input type="text" id="username" name="username" placeholder="请输入4-16位用户名" required>
+            <div class="error" id="usernameError">用户名格式不正确</div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">🍊 电子邮箱</label>
+            <input type="email" id="email" name="email" placeholder="请输入常用邮箱" required>
+            <div class="error" id="emailError">邮箱格式不正确</div>
+        </div>
+
+        <div class="form-group">
+            <label for="verificationCode">🍋 验证码</label>
+            <div class="verification-code">
+                <input type="text" id="verificationCode" name="verificationCode" placeholder="请输入6位验证码" required>
+                <button type="button" id="sendCodeBtn" class="btn btn-secondary">获取验证码</button>
+            </div>
+            <div class="error" id="codeError">验证码不正确</div>
+            <div class="countdown" id="countdown"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">🍉 设置密码</label>
+            <input type="password" id="password" name="password" placeholder="请输入6-20位密码" required>
+            <div class="error" id="passwordError">密码长度应为6-20位</div>
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">🍇 确认密码</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="请再次输入密码" required>
+            <div class="error" id="confirmPasswordError">两次密码不一致</div>
+        </div>
+
+        <button type="submit" class="btn">立即注册</button>
+    </form>
+
+    <div class="login-link">
+        已有账号？<a href="#">立即登录</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // 获取表单值
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const verificationCode = document.getElementById('verificationCode').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        // 重置错误提示
+        document.querySelectorAll('.error').forEach(el => el.style.display = 'none');
+
+        // 验证用户名
+        if (!/^[a-zA-Z0-9_-]{4,16}$/.test(username)) {
+            document.getElementById('usernameError').style.display = 'block';
+            return;
+        }
+
+        // 验证邮箱
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            document.getElementById('emailError').style.display = 'block';
+            return;
+        }
+
+        // 验证验证码 (这里简单验证是否为6位数字，实际应与服务器验证)
+        if (!/^\d{6}$/.test(verificationCode)) {
+            document.getElementById('codeError').textContent = '验证码必须是6位数字';
+            document.getElementById('codeError').style.display = 'block';
+            return;
+        }
+
+        // 验证密码
+        if (password.length < 6 || password.length > 20) {
+            document.getElementById('passwordError').style.display = 'block';
+            return;
+        }
+
+        // 验证确认密码
+        if (password !== confirmPassword) {
+            document.getElementById('confirmPasswordError').style.display = 'block';
+            return;
+        }
+
+        // 表单验证通过，可以提交到服务器
+        alert('注册成功！欢迎加入鲜果多商城');
+        // 这里可以添加AJAX提交代码
+        // this.submit();
+
+        // 重置表单
+        this.reset();
+    });
+
+    // 获取验证码按钮点击事件
+    document.getElementById('sendCodeBtn').addEventListener('click', function() {
+        const email = document.getElementById('email').value;
+        const emailError = document.getElementById('emailError');
+
+        // 验证邮箱格式
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            emailError.textContent = '请输入有效的邮箱地址';
+            emailError.style.display = 'block';
+            return;
+        }
+
+        // 发送验证码 (这里只是模拟，实际需要调用后端API)
+        // 发送验证码请求
+        fetch('/users/code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('验证码已发送至您的邮箱，请查收');
+                    startCountdown(); // 开始倒计时
+                } else {
+                    emailError.textContent = data.message || '发送验证码失败';
+                    emailError.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                emailError.textContent = '网络错误，请稍后重试';
+                emailError.style.display = 'block';
+            });
+
+        // 开始倒计时
+        let countdown = 60;
+        const countdownElement = document.getElementById('countdown');
+        const sendCodeBtn = document.getElementById('sendCodeBtn');
+
+        sendCodeBtn.disabled = true;
+        sendCodeBtn.textContent = `${countdown}秒后重发`;
+
+        const timer = setInterval(() => {
+            countdown--;
+            sendCodeBtn.textContent = `${countdown}秒后重发`;
+
+            if (countdown <= 0) {
+                clearInterval(timer);
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.textContent = '获取验证码';
+                countdownElement.textContent = '';
+            } else {
+                countdownElement.textContent = `验证码已发送，${countdown}秒后可重新获取`;
+            }
+        }, 1000);
+    });
+
+    // 实时验证输入
+    document.getElementById('username').addEventListener('input', function() {
+        if (!/^[a-zA-Z0-9_-]{4,16}$/.test(this.value)) {
+            document.getElementById('usernameError').style.display = 'block';
+        } else {
+            document.getElementById('usernameError').style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>
