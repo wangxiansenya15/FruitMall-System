@@ -8,4 +8,7 @@ target/
 #忽略测试文件夹
 src/test/
 
-src/resources/static/
+src/main/resources/static/
+
+#忽略macOS下的隐藏文件
+.DS_Store
