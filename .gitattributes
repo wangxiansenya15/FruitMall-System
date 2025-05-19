@@ -1,0 +1,18 @@
+# 自动处理所有文本文件的换行符
+* text=auto
+
+# 明确指定某些文本文件使用 LF 换行，并在提交时保留 LF
+*.java text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+
+# 标记二进制文件，避免 Git 尝试转换换行符
+*.png binary
+*.jpg binary
+*.gif binary
+*.class binary
+*.jar binary
+

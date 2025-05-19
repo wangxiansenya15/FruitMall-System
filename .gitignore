@@ -1,0 +1,11 @@
+#忽略 JIT编译后产生的字节码文件夹
+target/
+
+#忽略idea的配置文件
+.idea/
+.trae/
+
+#忽略测试文件夹
+src/test/
+
+src/resources/static/
