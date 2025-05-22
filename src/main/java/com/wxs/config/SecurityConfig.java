@@ -1,5 +1,7 @@
 package com.wxs.config;
 
+import com.wxs.pojo.entity.Role;
+import com.wxs.pojo.entity.User;
 import com.wxs.pojo.entity.UserDetail;
 import com.wxs.service.UserService;
 import com.wxs.util.JwtAuthenticationFilter;
@@ -15,12 +17,10 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -32,11 +32,6 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    @Autowired
-    @Lazy
-    private PasswordEncoder passwordEncoder;
-
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtUtils jwtUtils, UserDetailsService userDetailsService) {
@@ -52,10 +47,10 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // 公开访问路径
-                        .requestMatchers("/login", "/static/**", "/api/auth/code", "/api/auth/login", "/api/auth/register").permitAll()
+                        .requestMatchers("/static/**", "/auth/**").permitAll()
                         // 角色权限控制
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers("/goods/**").hasAnyRole("USER", "ADMIN")
                         // 其他请求需要认证
                         .anyRequest().authenticated()
                 )
@@ -98,17 +93,16 @@ public class SecurityConfig {
                 throw new UsernameNotFoundException("用户不存在");
             }
 
-
             // 检查 UserDetail 是否为 null
-            UserDetail detail = user.getDetails();
-            if (detail == null) {
+            Role role = user.getRole();
+            if (role == null) {
                 throw new BadCredentialsException("用户详细信息不存在");
             }
 
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getUsername())
                     .password(user.getPassword())
-                    .roles(new String[]{(user.getDetails().getRole().name())})
+                    .roles(new String[]{(user.getRole().name())})
                     .build();
         };
     }

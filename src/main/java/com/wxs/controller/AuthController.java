@@ -6,6 +6,7 @@ import com.wxs.pojo.dto.Result;
 import com.wxs.pojo.dto.UserDTO;
 import com.wxs.pojo.entity.User;
 import com.wxs.pojo.entity.UserDetail;
+import com.wxs.service.AuthenticationService;
 import com.wxs.service.UserService;
 import com.wxs.util.JwtUtils;
 import jakarta.annotation.Resource;
@@ -22,6 +23,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -29,11 +31,18 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @Slf4j
 public class AuthController {
+    private final UserService userService;
+
+    // 推荐使用构造函数注入
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
+
     @Autowired
-    UserService userService;
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     UserController userContrller;
@@ -42,11 +51,7 @@ public class AuthController {
     JavaMailSender javaMailSender;
 
     @Autowired
-    private JwtUtils jwtUtils;
-
-    // 在类顶部添加如下注入代码：
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private AuthenticationService  authService;
 
 
     @PostMapping("/code")
@@ -84,60 +89,34 @@ public class AuthController {
     public Result<User> registerUser(@RequestBody User user) {
         String username = user.getUsername();
         boolean flag = userService.existsByUsername(username);
-
         if (flag) {
             return Result.fail(400, "用户名已存在，请重新输入");
         }
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         // 继续注册
         return userContrller.insertUser(user);
     }
 
     @PostMapping("/login")
-    public Result<?> login(@RequestBody UserDTO userDTO) {
+    public Result<UserDTO> login(@RequestBody UserDTO userDTO) {
         log.info("开始处理登录请求，用户名: {}", userDTO.getUsername());
 
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(userDTO.getUsername(), userDTO.getPassword())
-            );
-            log.info("用户凭证验证成功");
-
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String token = jwtUtils.generateToken(userDetails.getUsername());
-            log.info("JWT令牌生成成功，长度: {}", token.length());
-
-            // 获取用户详情（包含角色、头像等）
-            User user = userService.getUserByUsername(userDetails.getUsername());
-            if (user == null) {
-                log.warn("用户不存在: {}", userDetails.getUsername());
-                return Result.fail(400,"用户不存在");
-            }
-
-            UserDetail details = user.getDetails();
-            if (details == null) {
-                log.warn("用户详细信息缺失，用户名: {}", userDetails.getUsername());
-                return Result.fail(400,"用户详细信息缺失");
-            }
-
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .toList();
-
-            UserDTO responseUserDTO = new UserDTO(token, userDetails.getUsername(), roles);
-            responseUserDTO.setAvatar(details.getAvatar());
-
-            log.info("登录成功，返回200 OK响应");
-            return Result.success("登录成功", responseUserDTO);
-
-        } catch (BadCredentialsException ex) {
-            log.warn("登录失败: 凭证无效 - {}", ex.getMessage());
-            return Result.fail(400, "凭证无效,用户名或密码错误");
-        } catch (Exception ex) {
-            log.error("登录过程中发生异常: {}", ex.getClass().getName(), ex);
-            return Result.serverError("登录过程中发生异常，请稍后再试");
-        }
+        return authService.authenticate(userDTO);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

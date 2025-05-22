@@ -1,5 +1,6 @@
 package com.wxs.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -29,44 +31,65 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String token = jwtUtils.getTokenFromRequest(request);
-
-        if (token != null && jwtUtils.validateToken(token)) {
-            String username = jwtUtils.getUsernameFromToken(token);
-            UserDetails userDetails;
-
-            try {
-                userDetails = userDetailsService.loadUserByUsername(username);
-            } catch (Exception e) {
-                logger.warn("无法加载用户详情: {}");
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "未找到用户");
-                return;
-            }
-
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-
-            logger.info("JWT验证通过，用户：{}");
-            // 设置认证信息到安全上下文
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }else {
-            // 只有在请求需要认证的路径时才记录警告
-            if (!shouldNotFilter(request)) {
-                logger.warn("无效或缺失Token，请求路径: {}");
-            }
+        // 首先检查是否应该跳过过滤
+        if (shouldNotFilter(request)) {
+            log.info("跳过JWT验证，公开访问路径: {}", request.getRequestURI());
+            filterChain.doFilter(request, response);
+            return;
         }
+        
+        String token = jwtUtils.getTokenFromRequest(request);
+        String path = request.getRequestURI();
+        
+        // 如果没有token或token无效
+        if (token == null || !jwtUtils.validateToken(token)) {
+            log.warn("无效或缺失Token，请求路径: {}", path);
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
+        // Token有效，进行用户认证
+        String username = jwtUtils.getUsernameFromToken(token);
+        UserDetails userDetails;
+
+        try {
+            userDetails = userDetailsService.loadUserByUsername(username);
+        } catch (Exception e) {
+            log.warn("无法加载用户详情: {}", e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "未找到用户");
+            return;
+        }
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+
+        log.info("JWT验证通过，用户：{}", username);
+        // 设置认证信息到安全上下文
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }
 
 
     /**
-     * 跳过某些路径的过滤（如登录接口）
+     * 确定哪些请求应该跳过JWT过滤器
+     * 
+     * @param request HTTP请求
+     * @return 如果请求应该跳过过滤返回true，否则返回false
      */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return "/api/auth/login".equals(path) || "/api/auth/code".equals(path) || "/api/auth/register".equals(path);
+        // 明确定义需要放行的路径
+        boolean shouldSkip = path.startsWith("/auth") ||
+                            path.startsWith("/static/") ||
+                            path.startsWith("/users") ;
+        
+        if (shouldSkip) {
+            log.debug("放行路径: {}", path);
+        }
+        
+        return shouldSkip;
     }
 }
 
