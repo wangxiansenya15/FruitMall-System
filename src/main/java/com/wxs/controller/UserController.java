@@ -74,7 +74,7 @@ public class UserController {
 
     // 更新用户状态（PATCH /users/{id}/status）
     @PatchMapping("/{id}/status")
-    public Result<UserStatus> updateUserStatus(@PathVariable Integer id, @RequestBody Map<String, Object> statusData) {
+    public Result<?> updateUserStatus(@PathVariable Integer id, @RequestBody Map<String, Object> statusData) {
         // 从请求体中获取状态信息
         log.info("接收到用户状态更新请求，用户ID: {}, 状态数据: {}", id, statusData);
         

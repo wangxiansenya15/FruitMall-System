@@ -36,7 +36,6 @@ public class User implements Serializable {
 
     //  枚举字段,用于表示用户状态，默认为正常
     @TableField(exist = false)
-    @EnumValue
     private UserStatus status;
 
 

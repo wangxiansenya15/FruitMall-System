@@ -26,10 +26,8 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("select * from user")
     List<User> getAllUsers();
 
-    @Update("UPDATE user SET enabled=#{enabled}, account_non_expired=#{accountNonExpired}, " +
-            "account_non_locked=#{accountNonLocked}, credentials_non_expired=#{credentialsNonExpired} WHERE id=#{id}")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    int updateStatus(Integer id,
+    @Update("UPDATE user SET enabled=#{enabled}, account_non_expired=#{accountNonExpired}, account_non_locked=#{accountNonLocked}, credentials_non_expired=#{credentialsNonExpired} WHERE id=#{id}")
+    int updateStatus(@Param("id") Integer id,
                      @Param("enabled") boolean enabled,
                      @Param("accountNonExpired") boolean accountNonExpired,
                      @Param("accountNonLocked") boolean accountNonLocked,

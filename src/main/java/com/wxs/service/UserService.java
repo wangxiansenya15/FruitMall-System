@@ -119,28 +119,42 @@ public class UserService {
         }
         
         // 记录更新前的状态值，用于调试
-        log.debug("更新前的状态值 - enabled: {}, accountNonExpired: {}, accountNonLocked: {}, credentialsNonExpired: {}",
+        log.info("更新前的状态值 - enabled: {}, accountNonExpired: {}, accountNonLocked: {}, credentialsNonExpired: {}",
                 user.isEnabled(), user.isAccountNonExpired(), user.isAccountNonLocked(), user.isCredentialsNonExpired());
         
         // 记录要更新的状态值
-        log.debug("要更新的状态值 - enabled: {}, accountNonExpired: {}, accountNonLocked: {}, credentialsNonExpired: {}",
+        log.info("要更新的状态值 - enabled: {}, accountNonExpired: {}, accountNonLocked: {}, credentialsNonExpired: {}",
                 status.isEnabled(), status.isAccountNonExpired(), status.isAccountNonLocked(), status.isCredentialsNonExpired());
         
-        // 执行更新操作
-        int updated = userMapper.updateStatus(
-                id,
-                status.isEnabled(),
-                status.isAccountNonExpired(),
-                status.isAccountNonLocked(),
-                status.isCredentialsNonExpired()
-        );
-        
-        if (updated > 0) {
-            log.info("用户状态更新成功，用户ID: {}", id);
-            return Result.success("用户状态更新成功", status);
-        } else {
-            log.warn("用户状态更新失败，用户ID: {}", id);
-            return Result.fail(400, "用户状态更新失败");
+        try {
+            // 执行更新操作
+            log.info("执行SQL更新操作，用户ID: {}", id);
+            int updated = userMapper.updateStatus(
+                    id,
+                    status.isEnabled(),
+                    status.isAccountNonExpired(),
+                    status.isAccountNonLocked(),
+                    status.isCredentialsNonExpired()
+            );
+            
+            log.info("SQL执行结果: updated={}", updated);
+            
+            if (updated > 0) {
+                // 再次获取用户，验证更新是否生效
+                User updatedUser = getUserById(id);
+                log.info("更新后的状态值 - enabled: {}, accountNonExpired: {}, accountNonLocked: {}, credentialsNonExpired: {}",
+                        updatedUser.isEnabled(), updatedUser.isAccountNonExpired(), 
+                        updatedUser.isAccountNonLocked(), updatedUser.isCredentialsNonExpired());
+                
+                log.info("用户状态更新成功，用户ID: {}", id);
+                return Result.success("用户状态更新成功", status);
+            } else {
+                log.warn("用户状态更新失败，SQL执行未影响任何行，用户ID: {}", id);
+                return Result.fail(400, "用户状态更新失败");
+            }
+        } catch (Exception e) {
+            log.error("更新用户状态时发生异常，用户ID: {}, 异常信息: {}", id, e.getMessage(), e);
+            return Result.fail(500, "更新用户状态时发生异常: " + e.getMessage());
         }
     }
 }

@@ -119,7 +119,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173")); // 前端地址
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // 允许的请求方法
         config.setAllowedHeaders(List.of("*")); // 允许所有请求头
         config.setExposedHeaders(List.of("Authorization")); // 暴露给前端的头
         config.setAllowCredentials(true);
