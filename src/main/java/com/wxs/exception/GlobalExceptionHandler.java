@@ -1,67 +1,43 @@
 package com.wxs.exception;
 
-import lombok.Getter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.wxs.pojo.dto.Result;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.nio.file.AccessDeniedException;
-import java.util.Date;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
-    // 自定义错误响应类
-    @Getter
-    private static class ErrorDetails {
-        private final Date timestamp;
-        private final String message;
-        private final String details;
-
-        public ErrorDetails(Date timestamp, String message, String details) {
-            this.timestamp = timestamp;
-            this.message = message;
-            this.details = details;
-        }
-
-    }
-
-    // 统一错误响应构建方法
-    private ResponseEntity<ErrorDetails> buildErrorResponse(Exception ex, WebRequest request, HttpStatus status) {
-        ErrorDetails errorDetails = new ErrorDetails(
-                new Date(),
-                ex.getMessage(),
-                request.getDescription(false)
-        );
-        return new ResponseEntity<>(errorDetails, status);
-    }
-
+@Slf4j
+public class GlobalExceptionHandler {
+    // 资源不存在异常 (404)
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
-        return buildErrorResponse(ex, request, HttpStatus.NOT_FOUND);
+    Result<?> handleResourceNotFound(ResourceNotFoundException ex) {
+        return Result.notFound(ex.getMessage());
     }
 
+    // 参数校验异常 (400)
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<?> validationExceptionHandler(ValidationException ex, WebRequest request) {
-        return buildErrorResponse(ex, request, HttpStatus.BAD_REQUEST);
+    public Result<?> handleValidationException(ValidationException ex) {
+        return Result.badRequest(ex.getMessage());
     }
 
+    // 认证异常 (401)
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<?> authenticationExceptionHandler(AuthenticationException ex, WebRequest request) {
-        return buildErrorResponse(ex, request, HttpStatus.UNAUTHORIZED);
+    public Result<?> handleAuthenticationException(AuthenticationException ex) {
+        return Result.unauthorized(ex.getMessage());
     }
 
+    // 权限不足异常 (403)
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<?> accessDeniedExceptionHandler(AccessDeniedException ex, WebRequest request) {
-        return buildErrorResponse(ex, request, HttpStatus.FORBIDDEN);
+    public Result<?> handleAccessDeniedException(AccessDeniedException ex) {
+        return Result.forbidden(ex.getMessage());
     }
 
+    // 全局异常兜底处理 (500)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
-        return buildErrorResponse(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
+    public Result<?> handleGlobalException(Exception ex) {
+        log.error("系统异常: ", ex);
+        return Result.serverError("系统繁忙，请稍后重试");
     }
-
 }

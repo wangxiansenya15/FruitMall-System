@@ -83,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 明确定义需要放行的路径
         boolean shouldSkip = path.startsWith("/auth") ||
                             path.startsWith("/static/") ||
-                            path.startsWith("/users") ;
+                            path.startsWith("/users");
         
         if (shouldSkip) {
             log.debug("放行路径: {}", path);

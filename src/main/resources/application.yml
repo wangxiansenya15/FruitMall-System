@@ -45,6 +45,9 @@ spring:
       password:
       database: 0
       timeout: 5000
+avatar:
+  upload-dir: uploads/avatars
+  access-path: /avatar
 
 # swagger配置
 springdoc:
@@ -59,4 +62,3 @@ springdoc:
 jwt:
   secret: fruit-mall-secret-key-for-authentication-256bits  # 密钥长度已增加到至少32个字符(256位)
   expire: 864000  # 10天过期
-

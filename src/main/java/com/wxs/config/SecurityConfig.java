@@ -47,10 +47,10 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // 公开访问路径
-                        .requestMatchers("/static/**", "/auth/**").permitAll()
+                        .requestMatchers("/static/**", "/auth/**","/avatar/**", "/products/**").permitAll()
                         // 角色权限控制
-                        .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                        .requestMatchers("/goods/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/goods/**",  "/user/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
+                        .requestMatchers("/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         // 其他请求需要认证
                         .anyRequest().authenticated()
                 )

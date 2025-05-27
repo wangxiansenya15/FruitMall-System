@@ -49,11 +49,6 @@ public class JwtUtils {
 
     /**
      * 获取密钥对象
-     * 
-     * @return 密钥对象
-     */
-    /**
-     * 获取密钥对象
      * 使用安全的密钥生成方法，确保密钥长度符合JWT JWA规范(RFC 7518, Section 3.2)
      * 
      * @return 密钥对象

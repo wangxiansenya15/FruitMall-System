@@ -1,6 +1,5 @@
 package com.wxs.controller;
 
-import com.github.pagehelper.PageInfo;
 import com.wxs.pojo.dto.Result;
 import com.wxs.pojo.entity.User;
 import com.wxs.pojo.entity.UserStatus;
@@ -21,7 +20,7 @@ public class UserController {
 
     // 创建用户（POST /users）
     @PostMapping
-    public Result<User> insertUser(@RequestBody User user) {
+    public Result<?> insertUser(@RequestBody User user) {
         userService.insertUser(user);
         return Result.success("用户创建成功", user);
     }
@@ -29,25 +28,25 @@ public class UserController {
     // 删除用户（DELETE /users/{id}）
     @DeleteMapping("/{id}")
     public Result<?> deleteUserById(@PathVariable Integer id) {
-        return userService.deleteUserById(id)
-                ? Result.success()
-                : Result.notFound("用户不存在");
-    }
-
-    // 更新用户（PUT /users/{id}）
-    @PutMapping("/{id}")
-    public Result<?> updateUser(@RequestBody User user, @PathVariable Integer id) {
-        if (!id.equals(user.getId())) {
-            return Result.requestError("ID不匹配");
+        if (id == null) {
+            return Result.badRequest("ID不能为空");
         }
         if (userService.getUserById(id) == null) {
             return Result.notFound("用户不存在");
         }
-        boolean updated = userService.updateUser(user);
-        return updated ? Result.success("修改成功") : Result.serverError("更新失败，请重试");
+        return userService.deleteUserById(id);
     }
 
+    // 更新用户（PUT /users/{id}）
+    @PutMapping("/{id}")
+    public Result<Void> updateUser(@RequestBody User user, @PathVariable Integer id) {
+        if (!id.equals(user.getId())) {
+            return Result.badRequest("ID不匹配");
+        }
+        return userService.updateUser(user);
+    }
 
+    
     // 获取所有用户（GET /users）
 
     public Result<List<User>> getAllUsers() {
@@ -56,20 +55,16 @@ public class UserController {
 
 
     @GetMapping
-    public Result<PageInfo<User>> list(@RequestParam(defaultValue = "1") int page,
+    public Result<?> list(@RequestParam(defaultValue = "1") int page,
                        @RequestParam(defaultValue = "10") int size) {
-        PageInfo<User> pageInfo = userService.getUserList(page, size);
-        return Result.success(pageInfo);
+        return userService.getUserList(page, size);
     }
 
 
     // 获取单个用户（GET /users/{id}）
     @GetMapping("/{id}")
     public Result<?> getUserById(@PathVariable Integer id) {
-        User user = userService.getUserById(id);
-        return user != null
-                ? Result.success(user)
-                : Result.notFound("用户不存在");
+        return userService.getUserById(id);
     }
 
     // 更新用户状态（PATCH /users/{id}/status）
@@ -85,17 +80,17 @@ public class UserController {
                 status = UserStatus.valueOf((String) statusData.get("status"));
             } catch (IllegalArgumentException e) {
                 log.warn("无效的状态值: {}", statusData.get("status"));
-                return Result.fail(400,"无效的状态值");
+                return Result.badRequest("无效的状态值");
             }
         }
-        
+
         // 如果没有直接传status枚举，则从布尔值构建
         if (status == null) {
             boolean enabled = true;
             boolean accountNonExpired = true;
             boolean accountNonLocked = true;
             boolean credentialsNonExpired = true;
-            
+
             if (statusData.containsKey("enabled") && statusData.get("enabled") instanceof Boolean) {
                 enabled = (Boolean) statusData.get("enabled");
             }
@@ -108,10 +103,10 @@ public class UserController {
             if (statusData.containsKey("credentialsNonExpired") && statusData.get("credentialsNonExpired") instanceof Boolean) {
                 credentialsNonExpired = (Boolean) statusData.get("credentialsNonExpired");
             }
-            
+
             status = UserStatus.fromBooleans(enabled, accountNonExpired, accountNonLocked, credentialsNonExpired);
         }
-        
+
         log.info("解析后的用户状态: {}", status);
         return userService.updateStatus(id, status);
     }

@@ -12,3 +12,6 @@ src/main/resources/static/
 
 #忽略macOS下的隐藏文件
 .DS_Store
+
+#忽略上传的文件夹
+uploads/*

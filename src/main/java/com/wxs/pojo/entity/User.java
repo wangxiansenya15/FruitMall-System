@@ -26,12 +26,17 @@ public class User implements Serializable {
     @TableField(value = "email")
     private String email;
 
+    @TableField(value = "phone_number")
+    private String phone;
+
     @TableField(value = "role")
     @EnumValue
     private Role role;
 
+    @TableField(value = "nickname")
+    private String nickname;
+
     @TableField(exist = false)
-    @JsonIgnore // 避免 JSON 序列化时报错
     private UserDetail details;
 
     //  枚举字段,用于表示用户状态，默认为正常

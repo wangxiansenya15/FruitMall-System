@@ -16,7 +16,19 @@ public class Product {
 
     @TableField(value = "name")
     private String name;
+
+    @TableField(value = "price")
     private int price;
+
+    @TableField(value = "category")
+    private String category;
+
+    @TableField(value = "count")
     private int count;
-    private String remark;
+
+    @TableField(value = "remark")
+    private String description;
+
+    @TableField(value = "image_url")
+    private String imageUrl;
 }
