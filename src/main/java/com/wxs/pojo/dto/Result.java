@@ -52,12 +52,12 @@ public final class Result<T> {
     /**
      * 成功方法，自定义状态码和消息
      * @param <T> 泛型类型
-     *           @param code 自定义消息
+     *
      *           @param message 自定义消息
      * @return 成功的结果对象
      */
-    public static <T> Result<T> success(int code,  String message) {
-        return new Result<>(code, message,null);
+    public static <T> Result<T> success(String message) {
+        return new Result<>(OK, message,null);
     }
 
     /**

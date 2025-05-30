@@ -1,13 +1,10 @@
 package com.wxs.config;
 
-import com.wxs.pojo.entity.Role;
-import com.wxs.pojo.entity.User;
-import com.wxs.pojo.entity.UserDetail;
+import com.wxs.pojo.dto.Role;
 import com.wxs.service.UserService;
 import com.wxs.util.JwtAuthenticationFilter;
 import com.wxs.util.JwtUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -47,9 +44,9 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // 公开访问路径
-                        .requestMatchers("/static/**", "/auth/**","/avatar/**", "/products/**").permitAll()
+                        .requestMatchers("/static/**", "/auth/**","/avatar/**", "/products/**", "/product/**").permitAll()
                         // 角色权限控制
-                        .requestMatchers("/goods/**",  "/user/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
+                        .requestMatchers("/goods/**",  "/user/**",  "/cart/**", "/orders/**","/payment/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
                         .requestMatchers("/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         // 其他请求需要认证
                         .anyRequest().authenticated()

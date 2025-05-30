@@ -49,6 +49,18 @@ avatar:
   upload-dir: uploads/avatars
   access-path: /avatar
 
+product:
+  upload-dir: uploads/products
+  access-path: /product
+
+banner:
+  upload-dir: uploads/banners
+  access-path: /banner
+
+mybatis-plus:
+  configuration:
+    mapUnderscoreToCamelCase: true
+
 # swagger配置
 springdoc:
    api-docs:

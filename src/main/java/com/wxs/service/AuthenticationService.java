@@ -2,7 +2,7 @@ package com.wxs.service;
 
 import com.wxs.pojo.dto.Result;
 import com.wxs.pojo.dto.UserDTO;
-import com.wxs.pojo.entity.Role;
+import com.wxs.pojo.dto.Role;
 import com.wxs.pojo.entity.User;
 import com.wxs.util.JwtUtils;
 

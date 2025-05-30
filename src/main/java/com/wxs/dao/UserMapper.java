@@ -15,13 +15,13 @@ public interface UserMapper extends BaseMapper<User> {
     @Delete("DELETE FROM user WHERE id=#{id}")
     boolean deleteUserById(@Param("id") Integer id);
 
-    @Update("UPDATE user SET username=#{username},password=#{password}, email=#{email},role=#{role} where id=#{id}")
+    @Update("UPDATE user SET username=#{username}, email=#{email},role=#{role}, updateInfo_time = NOW() where id=#{id}")
     int updateUser(User user);
 
     @Select("select * from user where id=#{id}")
     User selectUserById(Integer id);
 
-    @Select("select * from user")
+    @Select("SELECT id, username, email, role, enabled, account_non_expired, account_non_locked, credentials_non_expired, register_time, updateInfo_time as updateTime FROM user")
     List<User> selectAllUsers();
 
     @Update("UPDATE user SET enabled=#{enabled}, account_non_expired=#{accountNonExpired}, account_non_locked=#{accountNonLocked}, credentials_non_expired=#{credentialsNonExpired} WHERE id=#{id}")
@@ -31,4 +31,9 @@ public interface UserMapper extends BaseMapper<User> {
                      @Param("accountNonLocked") boolean accountNonLocked,
                      @Param("credentialsNonExpired") boolean credentialsNonExpired);
 
+    @Select("select id from user where username= #{username}")
+    int selectIdByUsername(String username);
+
+    @Insert("INSERT INTO user_details (id) VALUES (#{id})")
+    int insertUserDetail(Integer id);
 }

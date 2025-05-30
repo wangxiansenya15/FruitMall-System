@@ -1,7 +1,5 @@
 package com.wxs.controller;
 
-import cn.hutool.core.util.RandomUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wxs.pojo.dto.Result;
 import com.wxs.pojo.dto.UserDTO;
 import com.wxs.pojo.entity.User;
@@ -9,16 +7,10 @@ import com.wxs.service.AuthenticationService;
 import com.wxs.service.EmailService;
 import com.wxs.service.UserService;
 
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.Map;
 
 @RestController

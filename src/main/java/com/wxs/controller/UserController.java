@@ -2,7 +2,7 @@ package com.wxs.controller;
 
 import com.wxs.pojo.dto.Result;
 import com.wxs.pojo.entity.User;
-import com.wxs.pojo.entity.UserStatus;
+import com.wxs.pojo.dto.UserStatus;
 import com.wxs.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +39,7 @@ public class UserController {
 
     // 更新用户（PUT /users/{id}）
     @PutMapping("/{id}")
-    public Result<Void> updateUser(@RequestBody User user, @PathVariable Integer id) {
+    public Result<?> updateUser(@RequestBody User user, @PathVariable Integer id) {
         if (!id.equals(user.getId())) {
             return Result.badRequest("ID不匹配");
         }

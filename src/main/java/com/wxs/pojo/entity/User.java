@@ -1,12 +1,14 @@
 package com.wxs.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.wxs.pojo.dto.Role;
+import com.wxs.pojo.dto.UserStatus;
 import lombok.Data;
 import org.springframework.data.annotation.Transient;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @TableName("user")
@@ -26,7 +28,7 @@ public class User implements Serializable {
     @TableField(value = "email")
     private String email;
 
-    @TableField(value = "phone_number")
+    @TableField(value = "phone")
     private String phone;
 
     @TableField(value = "role")
@@ -42,6 +44,14 @@ public class User implements Serializable {
     //  枚举字段,用于表示用户状态，默认为正常
     @TableField(exist = false)
     private UserStatus status;
+
+    @TableField(value = "register_time")
+    private Date registerTime;
+
+
+
+    @TableField(value = "updateInfo_time")
+    private Date updateTime;
 
 
     /** 数据库存储的四个原始字段

@@ -1,4 +1,4 @@
 package com.wxs.dao;
 
-public class OrderMapper {
+public interface OrderMapper {
 }

@@ -3,7 +3,7 @@ package com.wxs.service;
 import com.wxs.dao.UserMapper;
 import com.wxs.pojo.dto.Result;
 import com.wxs.pojo.entity.User;
-import com.wxs.pojo.entity.UserStatus;
+import com.wxs.pojo.dto.UserStatus;
 import com.wxs.util.PageUtils;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -45,13 +45,15 @@ public class UserService {
         if (existsByUsername(user.getUsername())) {
             return Result.error(Result.BAD_REQUEST, "用户名已存在");
         }
-        int inserted = userMapper.insertUser(user);
-        if (inserted > 0) {
+        int insertedUser = userMapper.insertUser(user);
+        user.setId(userMapper.selectIdByUsername(user.getUsername()));
+        int insertedDetail = userMapper.insertUserDetail(user.getId());
+        if ((insertedUser & insertedDetail) > 0) {
             log.info("用户创建成功，用户名: {}", user.getUsername());
             return Result.success("用户创建成功",user);
         }
         log.error("用户创建失败，用户名: {}", user.getUsername());
-        return Result.error(Result.INTERNAL_ERROR, "用户创建失败");
+        return Result.error(Result.INTERNAL_ERROR, "用户创建失败,请稍后重试");
     }
 
 
@@ -66,7 +68,7 @@ public class UserService {
             return Result.badRequest( "ID不能为空");
         }
         return userMapper.deleteUserById(id)
-                ? Result.success(Result.OK,"删除成功" )
+                ? Result.success("删除成功" )
                 : Result.serverError("删除失败");
     }
 
@@ -85,7 +87,7 @@ public class UserService {
             return Result.notFound("用户不存在");
         }
         return userMapper.updateUser(user) > 0 ?
-                Result.success(Result.OK,"更新成功") :
+                Result.success("更新成功") :
                 Result.serverError("更新失败");
     }
 
@@ -125,6 +127,7 @@ public class UserService {
         try {
             PageUtils.startPage(page, size);
             List<User> list = userMapper.selectAllUsers();
+            log.info("获取用户列表成功，用户list: {}", list);
             return Result.success(PageUtils.getPageInfo(list));
         } catch (RuntimeException e) {
             log.error("获取用户列表失败", e);

@@ -1,6 +1,7 @@
 package com.wxs.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.wxs.pojo.dto.Role;
 import lombok.Data;
 
 @Data
