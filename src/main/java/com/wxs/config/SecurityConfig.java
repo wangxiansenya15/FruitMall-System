@@ -26,6 +26,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * @author: wxs
+ * @date: 2025/05/17 15:15
+ * @description: Spring Security 配置类
+ */
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -44,9 +50,9 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // 公开访问路径
-                        .requestMatchers("/static/**", "/auth/**","/avatar/**", "/products/**", "/product/**").permitAll()
+                        .requestMatchers("/","/static/**", "/auth/**","/avatar/**", "/products/**", "/product/**").permitAll()
                         // 角色权限控制
-                        .requestMatchers("/goods/**",  "/user/**",  "/cart/**", "/orders/**","/payment/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
+                        .requestMatchers("/goods/**",  "/user/**",  "/cart/**", "/orders/**","/payment/**", "/msg/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
                         .requestMatchers("/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         // 其他请求需要认证
                         .anyRequest().authenticated()

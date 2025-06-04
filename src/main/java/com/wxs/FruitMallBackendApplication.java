@@ -6,12 +6,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
+@EnableAsync  // 开启异步功能
 @MapperScan("com.wxs.dao") // 扫描 Mapper 接口
-@ComponentScan(basePackages = {"com.wxs.controller", "com.wxs.service", "com.wxs.config", "com.wxs.util"})
 @Slf4j
 public class FruitMallBackendApplication {
 

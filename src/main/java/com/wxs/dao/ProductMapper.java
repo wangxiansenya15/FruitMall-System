@@ -2,9 +2,11 @@ package com.wxs.dao;
 
 import com.wxs.pojo.entity.Product;
 import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 @Mapper
 public interface ProductMapper {
     @Select("SELECT product_id as id, name, price, remark as description, category, count as stock, image_url as imageUrl, rating FROM product WHERE product_id = #{id}")

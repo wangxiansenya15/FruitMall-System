@@ -2,13 +2,20 @@ package com.wxs.dao;
 
 import com.wxs.pojo.entity.Favorite;
 import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
+ * @author: Claude 4.0 Sonnet
+ * @date: 2025/05/29 22:05
+ *
+ * @description:
  * 用户收藏数据访问层
  * 提供收藏相关的数据库操作
  */
+
+@Repository
 @Mapper
 public interface FavoriteMapper {
 

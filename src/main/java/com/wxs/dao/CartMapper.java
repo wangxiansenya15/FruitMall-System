@@ -2,9 +2,17 @@ package com.wxs.dao;
 
 import com.wxs.pojo.entity.Cart;
 import org.apache.ibatis.annotations.*;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * @author: Arthur Wang
+ * @date: 2025/5/28 23:09
+ * @description: 购物车数据访问接口
+ */
+
+@Repository
 @Mapper
 public interface CartMapper {
 

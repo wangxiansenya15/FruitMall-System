@@ -12,9 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
+ * @Description:
  * 用户收藏控制器
  * 提供收藏相关的REST API接口
+ *
+ * @author Anthropic Claude 4.0
+ * @date 2025/05/29
  */
+
 @RestController
 @RequestMapping("/user/favorites")
 @Slf4j

@@ -6,7 +6,17 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.springframework.stereotype.Repository;
 
+/**
+ *
+ * @author: wxs
+ * @date: 2025/05/25 14:05
+ * @description: 用户信息Mapper持久化
+ *
+ */
+
+@Repository
 @Mapper
 public interface ProfileMapper {
 

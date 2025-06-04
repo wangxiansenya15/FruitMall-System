@@ -45,8 +45,4 @@ public class AuthController {
         return authService.authenticate(userDTO);
     }
 
-    @PostMapping("/msg")
-    public String sendNotification(@RequestBody Map<String, String> payload, HttpSession session) {
-        return emailService.sendDisciplinaryNotice(payload, session);
-    }
 }
