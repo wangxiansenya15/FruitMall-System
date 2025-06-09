@@ -1,9 +1,5 @@
-
-
-
-
-
-
+-- 创建数据库
+ CREATE DATABASE IF NOT EXISTS `fruit_db`;
 
 
 -- 员工表
@@ -46,7 +42,7 @@ CREATE TABLE contact_messages (
                                   email VARCHAR(100) NOT NULL COMMENT '邮箱地址',
                                   problem VARCHAR(200) NOT NULL COMMENT '问题反馈',
                                   message TEXT NOT NULL COMMENT '留言内容',
-                                  submit_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
+                                  submit_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
                                   status TINYINT DEFAULT 0 COMMENT '处理状态：0-未处理，1-处理中，2-已处理',
                                   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
                                   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'

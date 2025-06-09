@@ -7,15 +7,34 @@ spring:
   # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/fruitdb
-    username: root
-    password: wjb202218
+    url: jdbc:mysql://localhost:3306/fruit_db
+    username: root   // default username
+    password: your_password
     # 数据库连接池配置
-#    type: com.alibaba.druid.pool.DruidDataSource
-#    druid:
-#      initial-size: 5
-#      min-idle: 15
-#      max-active: 20
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # 连接池大小（根据服务器CPU核心数调整）
+      initial-size: 5
+      min-idle: 10     #最小空闲连接数
+      max-active: 20     # 最大连接数
+
+      # 超时控制（单位：毫秒）
+      connect-timeout: 3000    # 建立连接超时（默认1秒，建议3秒）
+      socket-timeout: 60000    # 网络请求超时（默认0无限等待，建议60秒）
+      transaction-query-timeout: 120  # 事务SQL超时（秒）
+      query-timeout: 30        # 单条SQL执行超时（秒）
+      remove-abandoned-timeout: 300  # 连接泄漏回收时间（秒）
+
+      #  日志和防御行配置(防止SQL注入攻击)
+      filters: wall,slf4j
+      wall:
+        enabled: true
+        config:
+          select-allow: true
+          select-limit: 1000     # 限制SELECT返回行数
+          delete-where-none: true  # 禁止无WHERE的DELETE
+          update-where-none: true  # 禁止无WHERE的UPDATE
+          metadata-perm: false    # 禁止访问元数据表
 
   # 文件配置
   servlet:
@@ -25,12 +44,13 @@ spring:
 
   # mybatis-plus配置
 
+
   # 邮件配置
   mail:
     host: smtp.qq.com
-    username: 2958367950@qq.com
+    username: your_mail_address
     port: 465
-    password: qaxmkjtzsyvtdfed
+    password: your_mail_password
     properties:
       mail.smtp.ssl.enable: true
       mail.smtp.auth: true
@@ -45,17 +65,11 @@ spring:
       password:
       database: 0
       timeout: 5000
-avatar:
-  upload-dir: uploads/avatars
-  access-path: /avatar
 
-product:
-  upload-dir: uploads/products
-  access-path: /product
+images:
+#    upload-dir: /root/...   # 服务器上的图片保存目录
+     upload-dir: /Users/mac/Desktop/uploads/  //  本地图片保存目录
 
-banner:
-  upload-dir: uploads/banners
-  access-path: /banner
 
 mybatis-plus:
   configuration:

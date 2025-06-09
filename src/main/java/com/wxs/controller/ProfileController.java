@@ -3,6 +3,7 @@ package com.wxs.controller;
 import com.wxs.pojo.dto.PasswordDTO;
 import com.wxs.pojo.dto.Result;
 import com.wxs.pojo.entity.User;
+import com.wxs.service.ImageStorageService;
 import com.wxs.service.ProfileService;
 
 import com.wxs.service.UserService;
@@ -10,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/user")
@@ -21,6 +25,9 @@ public class ProfileController {
 
     @Autowired
     private UserService  userService;
+
+    @Autowired
+    private ImageStorageService imageStorageService;
 
     /**
      * 获取当前登录用户实体对象
@@ -70,5 +77,19 @@ public class ProfileController {
             return Result.forbidden("未认证");
         }
         return profileService.revisePassword(user.getId(), passwordDto.getOldPassword(),passwordDto.getNewPassword());
+    }
+
+    @PostMapping("/avatar")
+    public Result<?> uploadAvatar(@RequestParam("file") MultipartFile file) throws IOException {
+        // 从上下文中获取用户名
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return Result.forbidden("未认证");
+        }
+        log.info("接收到文件: {}", file.getOriginalFilename());
+        if (file.isEmpty()) {
+            return Result.badRequest("文件为空");
+        }
+        return imageStorageService.storeFile(file, currentUser.getId());
     }
 }

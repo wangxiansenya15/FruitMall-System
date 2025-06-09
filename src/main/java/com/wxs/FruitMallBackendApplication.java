@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@EnableTransactionManagement
+@EnableTransactionManagement //  开启事务功能
 @EnableAsync  // 开启异步功能
 @MapperScan("com.wxs.dao") // 扫描 Mapper 接口
 @Slf4j

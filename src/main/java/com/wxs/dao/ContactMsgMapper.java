@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Mapper
 public interface ContactMsgMapper {
-    @Insert("INSERT INTO contact_messages (username, email, problem, message, submit_time) VALUES (#{username}, #{email}, #{problem}, #{message}, #{submitTime})")
+    @Insert("INSERT INTO contact_messages (username, email, problem, message) " +
+            "VALUES (#{username}, #{email}, #{problem}, #{message})")
     int insertContactMsg(ContactMessage contactMsg);
 }

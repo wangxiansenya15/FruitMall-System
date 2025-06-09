@@ -9,7 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -81,7 +82,19 @@ public class JwtUtils {
                 .signWith(getSecretKey())  // 使用密钥对象签名JWT
                 .compact();  // 压缩JWT并返回
     }
-    
+
+    /**
+     * 获取当前认证的JWT令牌（适用于Spring Security环境）
+     * @return 当前令牌字符串，如果不存在则返回null
+     */
+    public String getCurrentToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getCredentials() instanceof String) {
+            return (String) authentication.getCredentials();
+        }
+        return null;
+    }
+
     /**
      * 生成带有自定义声明的JWT令牌
      *

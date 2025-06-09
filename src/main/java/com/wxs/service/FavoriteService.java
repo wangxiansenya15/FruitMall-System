@@ -6,6 +6,7 @@ import com.wxs.pojo.entity.Favorite;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -25,10 +26,12 @@ public class FavoriteService {
 
     /**
      * 添加商品到收藏夹
+     * 使用事务确保数据一致性，如果操作失败会自动回滚
      * @param userId 用户ID
      * @param productId 商品ID
      * @return 操作结果
      */
+    @Transactional(rollbackFor = Exception.class)
     public Result<Void> addToFavorites(Integer userId, Integer productId) {
         if (userId == null || productId == null) {
             return Result.badRequest("用户ID和商品ID不能为空");
@@ -63,10 +66,12 @@ public class FavoriteService {
 
     /**
      * 从收藏夹移除商品
+     * 使用事务确保数据一致性，如果操作失败会自动回滚
      * @param userId 用户ID
      * @param productId 商品ID
      * @return 操作结果
      */
+    @Transactional(rollbackFor = Exception.class)
     public Result<Void> removeFromFavorites(Integer userId, Integer productId) {
         if (userId == null || productId == null) {
             return Result.badRequest("用户ID和商品ID不能为空");
@@ -89,9 +94,11 @@ public class FavoriteService {
 
     /**
      * 获取用户收藏列表
+     * 只读事务，提高查询性能
      * @param userId 用户ID
      * @return 收藏列表
      */
+    @Transactional(readOnly = true)
     public Result<List<Favorite>> getFavoritesList(Integer userId) {
         if (userId == null) {
             return Result.error(Result.BAD_REQUEST,"用户ID不能为空");
@@ -103,16 +110,18 @@ public class FavoriteService {
             return Result.success("获取收藏列表成功", favorites);
         } catch (Exception e) {
             log.error("获取收藏列表时发生异常，用户ID: {}, 错误: {}", userId, e.getMessage(), e);
-            return Result.error(Result.INTERNAL_ERROR,"获取收藏列表失败，请稍后重试");
+            return Result.ServerError("获取收藏列表失败，请稍后重试");
         }
     }
 
     /**
      * 检查商品是否已被用户收藏
+     * 只读事务，提高查询性能
      * @param userId 用户ID
      * @param productId 商品ID
      * @return 是否已收藏
      */
+    @Transactional(readOnly = true)
     public Result<Boolean> isFavorited(Integer userId, Integer productId) {
         if (userId == null || productId == null) {
             return Result.error(Result.BAD_REQUEST,"用户ID和商品ID不能为空");
@@ -124,15 +133,17 @@ public class FavoriteService {
             return Result.success("查询成功", isFavorited);
         } catch (Exception e) {
             log.error("检查收藏状态时发生异常，用户ID: {}, 商品ID: {}, 错误: {}", userId, productId, e.getMessage(), e);
-            return Result.error(Result.INTERNAL_ERROR,"查询失败，请稍后重试");
+            return Result.ServerError("查询失败，请稍后重试");
         }
     }
 
     /**
      * 清空用户所有收藏
+     * 使用事务确保数据一致性，如果操作失败会自动回滚
      * @param userId 用户ID
      * @return 操作结果
      */
+    @Transactional(rollbackFor = Exception.class)
     public Result<Void> clearAllFavorites(Integer userId) {
         if (userId == null) {
             return Result.badRequest("用户ID不能为空");
@@ -150,9 +161,11 @@ public class FavoriteService {
 
     /**
      * 获取用户收藏总数
+     * 只读事务，提高查询性能
      * @param userId 用户ID
      * @return 收藏总数
      */
+    @Transactional(readOnly = true)
     public Result<Integer> getFavoriteCount(Integer userId) {
         if (userId == null) {
             return Result.error(Result.BAD_REQUEST,"用户ID不能为空");
@@ -163,7 +176,7 @@ public class FavoriteService {
             return Result.success("获取收藏总数成功", count);
         } catch (Exception e) {
             log.error("获取收藏总数时发生异常，用户ID: {}, 错误: {}", userId, e.getMessage(), e);
-            return Result.error(Result.INTERNAL_ERROR,"获取收藏总数失败，请稍后重试");
+            return Result.ServerError("获取收藏总数失败，请稍后重试");
         }
     }
 }

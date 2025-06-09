@@ -20,6 +20,9 @@ public class UserDTO {
     // 业务扩展字段
     private String avatar;
     private Integer memberLevel;
+    
+    // 用户状态相关字段
+    private UserStatus userStatus;
 
     public UserDTO() {
     }
@@ -32,5 +35,14 @@ public class UserDTO {
         this.token = token;
         this.username = username;
         this.roles = roles;
+    }
+    
+    // 包含用户状态信息的构造函数
+    public UserDTO(Integer id,String token, String username, List<String> roles, UserStatus userStatus) {
+        this.id = id;
+        this.token = token;
+        this.username = username;
+        this.roles = roles;
+        this.userStatus = userStatus;
     }
 }

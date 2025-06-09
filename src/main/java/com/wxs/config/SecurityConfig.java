@@ -50,30 +50,23 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // 公开访问路径
-                        .requestMatchers("/","/static/**", "/auth/**","/avatar/**", "/products/**", "/product/**").permitAll()
+                        .requestMatchers("/auth/**", "/products/**", "/product/**",
+                                "/store/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**").permitAll()
                         // 角色权限控制
-                        .requestMatchers("/goods/**",  "/user/**",  "/cart/**", "/orders/**","/payment/**", "/msg/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
+                        .requestMatchers("/goods/**",  "/user/**",  "/cart/**","/avatar/**", "/orders/**","/payment/**", "/msg/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "USER")
                         .requestMatchers("/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         // 其他请求需要认证
                         .anyRequest().authenticated()
                 )
-//                // 表单登录配置
-//                .formLogin(form -> form
-//                        .loginPage("/login")
-//                        .loginProcessingUrl("/auth")
-//                        .defaultSuccessUrl("/home")
-//                        .failureUrl("/login?error=true")
-//                )
                 // 异常处理
                 .exceptionHandling(e -> e
                         .accessDeniedPage("/403")
                 )
-//                // 登出配置
-//                .logout(logout -> logout
-//                        .logoutUrl("/logout")
-//                        .logoutSuccessUrl("/login?logout")
-//                        .invalidateHttpSession(true)
-//                )
                 // 禁用CSRF（适用于REST API场景）
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))

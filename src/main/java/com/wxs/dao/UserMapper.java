@@ -36,4 +36,14 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Insert("INSERT INTO user_details (id) VALUES (#{id})")
     int insertUserDetail(Integer id);
+
+    /**
+     * 更新用户密码
+     * 用于密码重置功能，直接更新用户的加密密码
+     * @param userId 用户ID
+     * @param encodedPassword 已加密的新密码
+     * @return 影响的行数
+     */
+    @Update("UPDATE user SET password=#{encodedPassword}, updateInfo_time = NOW() WHERE id=#{userId}")
+    int updateUserPassword(@Param("userId") Integer userId, @Param("encodedPassword") String encodedPassword);
 }

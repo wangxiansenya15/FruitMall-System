@@ -2,16 +2,13 @@ package com.wxs.service;
 
 import cn.hutool.core.util.RandomUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wxs.pojo.dto.Result;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Map;
 
 @Service
@@ -42,7 +39,7 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("2958367950@qq.com");
         message.setTo(email);
-        message.setSubject("水果商城——果鲜多，给你发的注册验证码");
+        message.setSubject("水果商城——鲜果多，给你发的安全验证码");
         message.setText("您的验证码是：" + code + "，5分钟内有效，为确保您的数据安全🔐请勿向他人泄漏。");
 
         try {

@@ -38,7 +38,7 @@ public final class Result<T> {
     /**
      * 服务器内部错误，或者资源不存在的状态码 500
      */
-    public static final int INTERNAL_ERROR = HttpStatus.HTTP_INTERNAL_ERROR;
+    public static final int SERVER_ERROR = HttpStatus.HTTP_INTERNAL_ERROR;
 
     // 私有构造方法
     private Result(int code, String message, T data) {
@@ -101,6 +101,10 @@ public final class Result<T> {
         return new Result<>(code, message, null);
     }
 
+    public static <T> Result<T> ServerError(String message) {
+        return error(SERVER_ERROR, message);
+    }
+
     // ------------ 快捷方法 ------------
 
     /**  快捷失败方法 返回400状态码  错误请求
@@ -135,7 +139,7 @@ public final class Result<T> {
      * @param message 错误信息
      */
     public static Result<Void> serverError(String message) {
-        return error(INTERNAL_ERROR, message);
+        return error(SERVER_ERROR, message);
     }
 
     // ------------ 链式方法 ------------

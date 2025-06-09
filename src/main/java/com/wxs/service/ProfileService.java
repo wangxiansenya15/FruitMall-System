@@ -5,10 +5,12 @@ import com.wxs.pojo.dto.Result;
 import com.wxs.pojo.entity.User;
 import com.wxs.pojo.entity.UserDetail;
 
+import com.wxs.util.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -40,6 +42,15 @@ public class ProfileService {
         return Result.success("用户信息已成功加载",user);
     }
 
+    /**
+     * 修改密码
+     * 使用事务确保数据一致性，如果操作失败会自动回滚
+     * @param id 用户ID
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     * @return 操作结果
+     */
+    @Transactional(rollbackFor = Exception.class)
     public Result<Void> revisePassword(Integer id, String oldPassword, String newPassword) {
         // 1. 参数非空校验
         if (newPassword == null || newPassword.trim().isEmpty()) {
@@ -72,6 +83,13 @@ public class ProfileService {
     }
 
 
+    /**
+     * 更新用户资料
+     * 使用事务确保数据一致性，如果操作失败会自动回滚
+     * @param user 用户信息
+     * @return 操作结果
+     */
+    @Transactional(rollbackFor = Exception.class)
     public Result<User> updateProfile(User user) {
         if (user == null || user.getId() == null) {
             return Result.error(Result.FORBIDDEN,"登录信息过期，请重新登录");
@@ -90,10 +108,10 @@ public class ProfileService {
             
             return (userUpdated && detailUpdated)
                     ? Result.success("个人信息更新成功")
-                    : Result.error(Result.INTERNAL_ERROR,"用户信息修改失败");
+                    : Result.ServerError("用户信息修改失败");
         } catch (Exception e) {
             log.error("更新用户信息时发生异常，用户ID: {}, 错误: {}", user.getId(), e.getMessage(), e);
-            return Result.error(Result.INTERNAL_ERROR,"用户信息修改失败: " + e.getMessage());
+            return Result.ServerError("用户信息修改失败: " + e.getMessage());
         }
     }
 

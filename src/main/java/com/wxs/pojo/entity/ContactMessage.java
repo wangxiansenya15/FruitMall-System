@@ -25,9 +25,6 @@ public class ContactMessage {
     @TableField(value = "problem")
     private String problem;
 
-    @TableField(value = "submit_time")
-    private Date submitTime;
-
     @TableField(value = "status")
     private Integer status;
 }

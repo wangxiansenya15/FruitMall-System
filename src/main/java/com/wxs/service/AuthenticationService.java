@@ -3,9 +3,11 @@ package com.wxs.service;
 import com.wxs.pojo.dto.Result;
 import com.wxs.pojo.dto.UserDTO;
 import com.wxs.pojo.dto.Role;
+import com.wxs.pojo.dto.UserStatus;
 import com.wxs.pojo.entity.User;
 import com.wxs.util.JwtUtils;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +34,9 @@ public class AuthenticationService {
     // 在类顶部添加如下注入代码：
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public Result<UserDTO> authenticate(UserDTO userDTO) {
         try {
@@ -60,7 +66,13 @@ public class AuthenticationService {
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-            UserDTO responseUserDTO = new UserDTO(token, userDetails.getUsername(), roles);
+            // 获取用户状态信息，用于前端检查用户状态是否正常
+            UserStatus userStatus = user.getStatus();
+            
+            log.info("用户状态检查 - 用户名: {}, 状态: {}", 
+                    userDetails.getUsername(), userStatus.getLabel());
+
+            UserDTO responseUserDTO = new UserDTO(user.getId(),token, userDetails.getUsername(), roles, userStatus);
 
             log.info("登录成功，返回200 OK响应");
             return Result.success("登录成功", responseUserDTO);
@@ -70,7 +82,107 @@ public class AuthenticationService {
             return Result.error(Result.BAD_REQUEST, "凭证无效,用户名或密码错误");
         } catch (Exception ex) {
             log.error("登录过程中发生异常: {}", ex.getClass().getName(), ex);
-            return Result.error(Result.INTERNAL_ERROR,"登录过程中发生异常，请稍后再试");
+            return Result.error(Result.SERVER_ERROR,"登录过程中发生异常，请稍后再试");
+        }
+    }
+
+    /**
+     * 验证验证码
+     * 检查用户输入的验证码是否与会话中存储的验证码匹配
+     * @param email 用户邮箱
+     * @param verificationCode 用户输入的验证码
+     * @param session HTTP会话对象
+     * @return 验证结果
+     */
+    public Result<?> verifyCode(String email, String verificationCode, HttpSession session) {
+        try {
+            // 参数校验
+            if (email == null || email.trim().isEmpty()) {
+                return Result.error(Result.BAD_REQUEST, "邮箱不能为空");
+            }
+            if (verificationCode == null || verificationCode.trim().isEmpty()) {
+                return Result.error(Result.BAD_REQUEST, "验证码不能为空");
+            }
+
+            // 从会话中获取存储的验证码
+            String storedCode = (String) session.getAttribute("verificationCode");
+            if (storedCode == null) {
+                log.warn("验证码验证失败: 会话中未找到验证码，邮箱: {}", email);
+                return Result.error(Result.BAD_REQUEST, "验证码已过期或不存在，请重新获取");
+            }
+
+            // 验证码比较（忽略大小写和前后空格）
+            if (!storedCode.trim().equalsIgnoreCase(verificationCode.trim())) {
+                log.warn("验证码验证失败: 验证码不匹配，邮箱: {}", email);
+                return Result.error(Result.BAD_REQUEST, "验证码错误");
+            }
+
+            log.info("验证码验证成功，邮箱: {}", email);
+            return Result.success("验证码验证成功", null);
+
+        } catch (Exception ex) {
+            log.error("验证码验证过程中发生异常，邮箱: {}", email, ex);
+            return Result.error(Result.SERVER_ERROR, "验证码验证失败，请稍后再试");
+        }
+    }
+
+    /**
+     * 重置密码
+     * 通过验证码验证后重置用户密码
+     * @param email 用户邮箱
+     * @param verificationCode 验证码
+     * @param newPassword 新密码
+     * @param session HTTP会话对象
+     * @return 重置结果
+     */
+    public Result<?> resetPassword(String email, String verificationCode, String newPassword, HttpSession session) {
+        try {
+            // 参数校验
+            if (email == null || email.trim().isEmpty()) {
+                return Result.error(Result.BAD_REQUEST, "邮箱不能为空");
+            }
+            if (verificationCode == null || verificationCode.trim().isEmpty()) {
+                return Result.error(Result.BAD_REQUEST, "验证码不能为空");
+            }
+            if (newPassword == null || newPassword.trim().isEmpty()) {
+                return Result.error(Result.BAD_REQUEST, "新密码不能为空");
+            }
+            if (newPassword.length() < 6 || newPassword.length() > 20) {
+                return Result.error(Result.BAD_REQUEST, "密码长度应为6-20个字符");
+            }
+
+            // 首先验证验证码
+            Result<?> verifyResult = verifyCode(email, verificationCode, session);
+            if (verifyResult.getCode() != Result.OK) {
+                return verifyResult; // 验证码验证失败，直接返回错误结果
+            }
+
+            // 根据邮箱查找用户
+            User user = userService.getUserByEmail(email);
+            if (user == null) {
+                log.warn("重置密码失败: 用户不存在，邮箱: {}", email);
+                return Result.error(Result.NOT_FOUND, "用户不存在");
+            }
+
+            // 加密新密码
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            
+            // 更新用户密码
+            boolean updateResult = userService.updateUserPassword(user.getId(), encodedPassword);
+            if (!updateResult) {
+                log.error("重置密码失败: 数据库更新失败，邮箱: {}", email);
+                return Result.error(Result.SERVER_ERROR, "密码重置失败，请稍后再试");
+            }
+
+            // 清除会话中的验证码，防止重复使用
+            session.removeAttribute("verificationCode");
+
+            log.info("密码重置成功，邮箱: {}", email);
+            return Result.success("密码重置成功", null);
+
+        } catch (Exception ex) {
+            log.error("重置密码过程中发生异常，邮箱: {}", email, ex);
+            return Result.error(Result.SERVER_ERROR, "密码重置失败，请稍后再试");
         }
     }
 }

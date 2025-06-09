@@ -42,7 +42,7 @@ public class ProductService {
             return Result.success("商品信息已成功加载", products);
         } catch (Exception e) {
             log.error("获取商品列表失败: {}", e.getMessage(), e);
-            return Result.error(Result.INTERNAL_ERROR, "获取商品列表失败，请稍后重试");
+            return Result.ServerError("获取商品列表失败，请稍后重试");
         }
     }
 
@@ -58,7 +58,7 @@ public class ProductService {
             return Result.success("商品分类已成功加载", categories);
         } catch (Exception e) {
             log.error("获取商品分类失败: {}", e.getMessage(), e);
-            return Result.error(Result.INTERNAL_ERROR, "获取商品分类失败，请稍后重试");
+            return Result.ServerError("获取商品分类失败，请稍后重试");
         }
     }
 

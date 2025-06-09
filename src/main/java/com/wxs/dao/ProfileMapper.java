@@ -41,6 +41,12 @@ public interface ProfileMapper {
     @Select("SELECT password FROM user WHERE id = #{id}")
     String selectPasswordById(Integer id);
 
+    @Select("SELECT avatar FROM user_details WHERE id = #{id}")
+    String selectAvatarById(Integer id);
+
+    @Update("UPDATE user_details SET avatar = #{avatar} WHERE id = #{id}")
+    void updateAvatar(Integer id, String avatar);
+
     /**
      * 更新用户基本信息
      * @param user 用户对象，包含要更新的字段
@@ -60,6 +66,4 @@ public interface ProfileMapper {
     @Update("UPDATE user SET password = #{password} WHERE id = #{id}")
     void updatePassword(Integer id, String password);
 
-    @Insert("INSERT INTO user_details (id, description, avatar, address) VALUES (#{id}, #{description}, #{avatar}, #{address})")
-    boolean insertUserDetail(UserDetail userDetail);
 }
