@@ -8,8 +8,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/fruit_db
-    username: root   // default username
-    password: your_password
+    username: root   # default database_username
+    password: your_password #Your database_password
     # 数据库连接池配置
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
@@ -68,7 +68,7 @@ spring:
 
 images:
 #    upload-dir: /root/...   # 服务器上的图片保存目录
-     upload-dir: /Users/mac/Desktop/uploads/  //  本地图片保存目录
+     upload-dir: /Users/mac/Desktop/uploads/  #local dir  本地图片保存目录
 
 
 mybatis-plus:
